@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model Pessoa {
+  idPessoa        Int      @id @default(autoincrement())
+  nome            String
+  cpf             String   @unique
+  dataNascimento  DateTime
+  contas          Conta[]
+}
+
+model Conta {
+  idConta             Int      @id @default(autoincrement())
+  idPessoa            Int
+  saldo              Float    @default(0.0)
+  limiteSaqueDiario  Float
+  flagAtivo          Boolean  @default(true)
+  tipoConta          Int
+  dataCriacao        DateTime @default(now())
+
+  pessoa             Pessoa   @relation(fields: [idPessoa], references: [idPessoa])
+  transacoes         Transacao[]
+}
+
+model Transacao {
+  idTransacao     Int      @id @default(autoincrement())
+  idConta         Int
+  valor           Float
+  dataTransacao   DateTime @default(now())
+
+  conta           Conta    @relation(fields: [idConta], references: [idConta])
+}
